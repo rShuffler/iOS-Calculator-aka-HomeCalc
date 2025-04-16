@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QGridLayout
 from PyQt5.QtGui import QFontDatabase, QFont
 from PyQt5.QtCore import Qt
+from settings import SettingsWindow  # Импортируем настройки
 
 class Calculator(QWidget):
     def __init__(self):
@@ -11,12 +12,11 @@ class Calculator(QWidget):
 
     def initUI(self):
         self.setWindowTitle("HomeCalc")
-        self.setGeometry(100, 100, 320, 450)
+        self.setGeometry(100, 100, 320, 500)  # Увеличил высоту для кнопки "Настройки"
         self.setStyleSheet("background-color: black; border-radius: 20px;")
 
         layout = QVBoxLayout()
 
-        # Подключаем San Francisco из локального файла
         font_id = QFontDatabase.addApplicationFont("fonts/SFPRODISPLAYBOLD.OTF")
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0] if font_id != -1 else "Arial"
 
@@ -46,7 +46,6 @@ class Calculator(QWidget):
         for text, row, col, rowspan, colspan in [(b + (1, 1) if len(b) == 3 else b) for b in buttons]:
             btn = QPushButton(text)
             btn.setFont(QFont(font_family, 24, QFont.Bold))
-
             btn.setStyleSheet(f"""
                 QPushButton {{
                     background-color: {'#FF9500' if text in ['÷', '×', '-', '+', '='] else '#505050'};
@@ -66,7 +65,20 @@ class Calculator(QWidget):
             button_layout.addWidget(btn, row, col, rowspan, colspan)
 
         layout.addLayout(button_layout)
+
+        # 🔹 Добавляем кнопку "Настройки"
+        self.settings_button = QPushButton("⚙️ Settings")
+        self.settings_button.setFont(QFont(font_family, 18))
+        self.settings_button.setStyleSheet("background-color: #222; color: white; border-radius: 10px; padding: 10px;")
+        self.settings_button.clicked.connect(self.open_settings)
+        layout.addWidget(self.settings_button)  # Добавляем в основной layout
+
         self.setLayout(layout)
+
+    def open_settings(self):
+        """Открывает окно настроек."""
+        self.settings_window = SettingsWindow()
+        self.settings_window.show()
 
     def on_button_click(self):
         sender = self.sender()
